@@ -1,0 +1,81 @@
+element::= 
+	M: addEventListener()
+	M: appendChild()
+	M: cloneNode()
+	M: contains()
+	M: getAttribute()
+	M: getAttributeNode()
+	M: getElementsByClassName()
+	M: getElementsByTagName()
+	M: getFeature()
+	M: hasAttribute()
+	M: hasAttributes()
+	M: hasChildNodes()
+	M: toString()	
+	M: removeAttribute()
+	M: removeChild()
+	M: setAttribute()
+	M: setAttributeNode()
+	A: id
+	A: innerHTML
+	A: parentNode
+	A: parentElement
+	A: contentEditable
+	A: dir
+	A: firstChild
+	A: firstElementChild
+	A: style
+	A: tabIndex
+	A: tagName
+	A: textContent
+	A: title
+	A: clientHeight
+	A: clientLeft
+	A: clientTop
+	A: clientWidth
+	A: childElementCount
+	A: childNodes
+	A: children
+	A: className
+	A: attributes
+
+iframe::= element
+	A: src
+	A: width
+	A: name
+
+button::= element
+	A: name
+	A: value
+	A: type
+
+textarea::= element
+	M: select
+	A: type
+	A: value
+
+canvas::= element
+	A: fillStyle
+	A: strokeStyle
+	A: shadowColor
+	A: shadowBlur
+	A: shadowOffsetX
+	A: shadowOffsetY
+	M: createLinearGradient()
+	M: createPattern()
+	M: createRadialGradient()
+	M: addColorStop()
+
+audio::= element
+	A: seeking
+	A: src
+	A: textTracks
+	A: volume
+	M: addTextTrack()
+	M: canPlayType()
+	M: fastSeek()
+	M: getStartDate()
+	M: load()
+	M: play()
+	M: pause()
+
