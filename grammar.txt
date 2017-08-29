@@ -13,55 +13,55 @@ element::
 	M: removeChild | Node -->
 	M: setAttribute | string, string -->
 	M: setAttributeNode | Node -->
-	A: id
-	A: innerHTML
-	A: parentNode
-	A: parentElement
-	A: contentEditable
-	A: dir
-	A: firstChild
-	A: firstElementChild
-	A: style
-	A: tabIndex
-	A: tagName
-	A: textContent
-	A: title
-	A: clientHeight
-	A: clientLeft
-	A: clientTop
-	A: clientWidth
-	A: childElementCount
-	A: childNodes
-	A: children
-	A: className
-	A: attributes
+	A: id | string
+	A: innerHTML | string
+	A: parentNode | string 
+	A: parentElement | string
+	A: contentEditable | string
+	A: dir | string
+	A: firstChild | string
+	A: firstElementChild | string
+	A: style | string
+	A: tabIndex | string
+	A: tagName | string
+	A: textContent | string
+	A: title | string
+	A: clientHeight | string
+	A: clientLeft | string
+	A: clientTop | string
+	A: clientWidth | string
+	A: childElementCount | string
+	A: childNodes | string
+	A: children | string
+	A: className | string
+	A: attributes | string
 
 iframe::element
-	A: src
-	A: width
-	A: name
+	A: src | string
+	A: width | string
+	A: name | string
 
 button::element
-	A: name
-	A: value
-	A: type
+	A: name | string
+	A: value | string
+	A: type | string
 
 textarea::element
 	M: select | -->
-	A: type
-	A: value
+	A: type | string
+	A: value | string
 
 canvas::element
 	M: createLinearGradient | -->
 	M: createPattern | -->
 	M: createRadialGradient | -->
 	M: addColorStop | -->
-	A: fillStyle
-	A: strokeStyle
-	A: shadowColor
-	A: shadowBlur
-	A: shadowOffsetX
-	A: shadowOffsetY
+	A: fillStyle | string
+	A: strokeStyle | string
+	A: shadowColor | string
+	A: shadowBlur | string
+	A: shadowOffsetX | string
+	A: shadowOffsetY | string
 
 
 audio::element
@@ -72,9 +72,9 @@ audio::element
 	M: load | -->
 	M: play | -->
 	M: pause | -->
-	A: seeking
-	A: src
-	A: textTracks
-	A: volume
+	A: seeking | string
+	A: src | string
+	A: textTracks | string
+	A: volume | string
 
 

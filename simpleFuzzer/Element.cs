@@ -6,25 +6,25 @@ namespace simpleFuzzer
     {
         public string name;
         public string type;
-        public List<string> attributes;
+        public List<EleAtt> attributes;
         public List<EleMethod> methods;
 
         public Element()
         {
             name = "";
             type = "";
-            attributes = new List<string>();
+            attributes = new List<EleAtt>();
             methods = new List<EleMethod>();
         }
         public Element(string t)
         {
             name = "";
             type = t;
-            attributes = new List<string>();
+            attributes = new List<EleAtt>();
             methods = new List<EleMethod>();
         }
 
-        public Element(string n, string t, List<string> att, List<EleMethod> me)
+        public Element(string n, string t, List<EleAtt> att, List<EleMethod> me)
         {
             name = n;
             type = t;

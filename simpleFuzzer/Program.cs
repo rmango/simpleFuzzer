@@ -12,7 +12,7 @@ namespace simpleFuzzer
     {
         public static int varCount = 0;
         public static int fileCount = 0;
-        public static List<Element> created = new List<Element>{ new Element("bool_x", "bool", new List<string>{"true", "false"}, new List<EleMethod>())};
+        public static List<Element> created = new List<Element>{ new Element("bool_x", "bool", new List<EleAtt>(), new List<EleMethod>())};
         public static Random rand = new Random();//Random must be outside of function
         static void Main(string[] args)
         {
@@ -62,7 +62,14 @@ namespace simpleFuzzer
             int numA = rand.Next(e.attributes.Count);
             for (int j = 0; j < numA; j++)
             {
-                block += e.name + ".setAttribute(" + e.attributes[rand.Next(e.attributes.Count)] + ", " + "ATTRIBUTEVALUE" + ");\n";
+                Console.WriteLine(e.attributes[0].name);//rand.Next(e.attributes.Count));
+                EleAtt at = e.attributes[rand.Next(e.attributes.Count)];
+                string valA = "";
+                if(at.values != null)
+                {
+                    valA = at.values[0];//[rand.Next(at.values.Length)];
+                }
+                block += e.name + ".setAttribute(" + at.name + ", " + valA + ");\n";
             }
             //add element to list of created elements
             created.Add(e);
@@ -106,7 +113,6 @@ namespace simpleFuzzer
                         created.Add(newEl);
                     }
                 }
-
                 block += e.name + "." + e.methods[randM].name + "(" +  value + ");\n";
             }
             return block;
@@ -149,8 +155,14 @@ namespace simpleFuzzer
                     }
                     else if (line.IndexOf("A: ") != -1)
                     {
-                        int start = line.IndexOf("A: ") + 3;
-                        temp.attributes.Add(line.Substring(start, line.Length - start));
+                        //create attribute object
+                        int Astart = line.IndexOf("A: ") + 3;
+                        int Aend = line.IndexOf("|") - 5;
+                        string nameA = line.Substring(Astart, Aend);
+                        string typeA = line.Substring(Aend + 7);
+                        Console.WriteLine("name: " + nameA + "type: " + typeA);
+                        EleAtt a = new EleAtt(nameA, typeA);
+                        temp.attributes.Add(a);
                     }
                 }
             }
