@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,53 +11,68 @@ namespace simpleFuzzer
     class Program
     {
         public static int varCount = 0;
+        public static int fileCount = 0;
+        public static List<Element> created = new List<Element>();
+        public static Random rand = new Random();//Random must be outside of function
         static void Main(string[] args)
         {
             //read grammar
-            string gram = System.IO.File.ReadAllText(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt").Trim();
+            string gram = File.ReadAllText(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt").Trim();
             //parse grammar
             List<Element> gra = ReadGram(gram);
-            foreach (Element e in gra)
+            /*foreach (Element e in gra)
             {
                 Console.WriteLine(e.type);
-            }
-
+            }*/
             //create string of file
             StringBuilder str = new StringBuilder();
-            List<Element> created = new List<Element>();
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < rand.Next(10, 15); i++)
             {
-                str.Append(GenerateRandElement(gra, created) + "\n");
+                str.Append(GenerateRandElement(gra, created));
             }
             Console.WriteLine(str);
+
             //turn string into file
-
-            //Append to Dom with appendChild
-
+            string fuzzFile = "fuzzerFile_" + fileCount;
+            FileStream fuzzerFile = File.Create(fuzzFile);
+            StreamWriter fileWrite = new StreamWriter(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\" + fuzzFile + ".js");
+            fileWrite.Write(str.ToString());
+            fileWrite.Close();
             Console.ReadLine();
         }
         public static string GenerateRandElement(List<Element> gram, List<Element> created)
         {
-            // choose random element index
-            Random rand = new Random();
-            int r = rand.Next(gram.Count);
+            //choose random element index
+            int r = rand.Next(1, gram.Count);
 
             //create element
             Element e = gram[r];
             e.name = e.type + "_" + varCount;
             varCount++;
 
+            //choose random way to append to dom
+            string[] domAppend = { "createTextNode", "appendChild", "insertBefore" };
+
             //initialize element in string
-            String block = "var " + e.name + " = " + "document.createElement(\"" + e.type + "\");\ndocument.body.appendChild(" + e.name + ");";
+            String block = "var " + e.name + " = " + "document.createElement(\"" + e.type + "\");\ndocument.body." + domAppend[rand.Next(domAppend.Length)] + "(" + e.name + ");\n";
+
+            //if has children, can replace or remove children
 
             //random number of attributes will be assigned
-            int num = rand.Next(e.attributes.Count);
-            for (int j = 0; j < num; j++)
+            int numA = rand.Next(e.attributes.Count);
+            for (int j = 0; j < numA; j++)
             {
-                block += "\n" + e.name + ".setAttribute(" + e.attributes[rand.Next(e.attributes.Count)] + ", " + "ATTRIBUTEVALUE" + ");";
+                block += e.name + ".setAttribute(" + e.attributes[rand.Next(e.attributes.Count)] + ", " + "ATTRIBUTEVALUE" + ");\n";
             }
             //add element to list of created elements
             created.Add(e);
+
+            //random number of methods to be called
+            int numM = rand.Next(e.methods.Count);
+            for (int j = 0; j < numM; j++)
+            {
+                block += e.name + "." + e.methods[rand.Next(e.methods.Count)] + "(" + "METHODVALUE" + ");\n";
+            }
 
             return block;
         }
@@ -69,15 +85,15 @@ namespace simpleFuzzer
             {
                 if (temp != null && line.Trim() != null)
                 {
-                    if (line.IndexOf("::=") != -1)
+                    if (line.IndexOf("::") != -1)
                     {
                         elements.Add(temp);
-                        temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::=")));
+                        temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")));
                     }
                     else if (line.IndexOf("M: ") != -1)
                     {
-                        int start = line.IndexOf("M:") + 3;
-                        temp.methods.Add(line.Substring(start, line.Length - start));
+                        int start = line.IndexOf("M: ") + 2;
+                        temp.methods.Add(line.Trim().Substring(start, line.Trim().IndexOf("|") - start - 1));
                     }
                     else if (line.IndexOf("A: ") != -1)
                     {

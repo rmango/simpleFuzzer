@@ -1,21 +1,18 @@
-element::= 
-	M: addEventListener()
-	M: appendChild()
-	M: cloneNode()
-	M: contains()
-	M: getAttribute()
-	M: getAttributeNode()
-	M: getElementsByClassName()
-	M: getElementsByTagName()
-	M: getFeature()
-	M: hasAttribute()
-	M: hasAttributes()
-	M: hasChildNodes()
-	M: toString()	
-	M: removeAttribute()
-	M: removeChild()
-	M: setAttribute()
-	M: setAttributeNode()
+element::
+	M: appendChild | -->
+	M: cloneNode | bool --> Node
+	M: contains | Node --> bool
+	M: getAttribute | string --> string
+	M: getElementsByClassName | string --> element[]
+	M: getElementsByTagName | string --> element[]
+	M: hasAttribute | string --> bool
+	M: hasAttributes | --> bool
+	M: hasChildNodes | --> bool
+	M: toString | --> string
+	M: removeAttribute | string -->
+	M: removeChild | node -->
+	M: setAttribute | string, string -->
+	M: setAttributeNode | node -->
 	A: id
 	A: innerHTML
 	A: parentNode
@@ -39,43 +36,45 @@ element::=
 	A: className
 	A: attributes
 
-iframe::= element
+iframe::element
 	A: src
 	A: width
 	A: name
 
-button::= element
+button::element
 	A: name
 	A: value
 	A: type
 
-textarea::= element
-	M: select
+textarea::element
+	M: select | -->
 	A: type
 	A: value
 
-canvas::= element
+canvas::element
+	M: createLinearGradient | -->
+	M: createPattern | -->
+	M: createRadialGradient | -->
+	M: addColorStop | -->
 	A: fillStyle
 	A: strokeStyle
 	A: shadowColor
 	A: shadowBlur
 	A: shadowOffsetX
 	A: shadowOffsetY
-	M: createLinearGradient()
-	M: createPattern()
-	M: createRadialGradient()
-	M: addColorStop()
 
-audio::= element
+
+audio::element
+	M: addTextTrack | -->
+	M: canPlayType | -->
+	M: fastSeek | -->
+	M: getStartDate | -->
+	M: load | -->
+	M: play | -->
+	M: pause | -->
 	A: seeking
 	A: src
 	A: textTracks
 	A: volume
-	M: addTextTrack()
-	M: canPlayType()
-	M: fastSeek()
-	M: getStartDate()
-	M: load()
-	M: play()
-	M: pause()
+
 
