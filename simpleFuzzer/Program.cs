@@ -71,14 +71,21 @@ namespace simpleFuzzer
             int numM = rand.Next(e.methods.Count);
             for (int j = 0; j < numM; j++)
             {
-                block += e.name + "." + e.methods[rand.Next(e.methods.Count)] + "(" + "METHODVALUE" + ");\n";
+                int randM = rand.Next(e.methods.Count);
+                string[] p = e.methods[randM].parameters.ToArray();
+                string str = "";
+                foreach (string param in p)
+                {
+                    str += param;
+                }
+                block += e.name + "." + e.methods[randM].name + "(" +  str + ");\n";
             }
 
             return block;
         }
         public static List<Element> ReadGram(string gram)
         {
-            string[] lines = System.IO.File.ReadAllLines(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt");
+            string[] lines = File.ReadAllLines(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt");
             List<Element> elements = new List<Element>();
             Element temp = new Element();
             foreach (string line in lines)
@@ -92,8 +99,31 @@ namespace simpleFuzzer
                     }
                     else if (line.IndexOf("M: ") != -1)
                     {
+                        //create method object w/name
                         int start = line.IndexOf("M: ") + 2;
-                        temp.methods.Add(line.Trim().Substring(start, line.Trim().IndexOf("|") - start - 1));
+                        EleMethod m = new EleMethod(line.Trim().Substring(start, line.Trim().IndexOf("|") - start - 1));
+
+                        //add parameters to method object
+                        int pstart = line.IndexOf("|") + 2;
+                        int plen = line.IndexOf("-->") - pstart;
+                        string ptemp = line.Substring(pstart, plen);
+                        if (ptemp.IndexOf(",") != -1 && ptemp.Trim().Length > 2)
+                        {
+                            m.parameters.Add(ptemp.Substring(0, ptemp.IndexOf(",")).Trim());
+                            ptemp = ptemp.Substring(ptemp.IndexOf(",") + 1);
+                        }
+                        if(ptemp.Trim() != "")
+                        {
+                            m.parameters.Add(ptemp.Trim());
+                        }
+                        temp.methods.Add(m);
+                        /*foreach (string p in m.parameters)
+                        {
+                            Console.WriteLine("parameterfinal: " + p);
+                        }*/
+                        //add return values
+                        //List<string> re = line.Trim().Substring(line.Trim().IndexOf("-->"));
+
                     }
                     else if (line.IndexOf("A: ") != -1)
                     {

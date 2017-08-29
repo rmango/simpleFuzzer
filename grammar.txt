@@ -1,5 +1,5 @@
 element::
-	M: appendChild | -->
+	M: appendChild |  -->
 	M: cloneNode | bool --> Node
 	M: contains | Node --> bool
 	M: getAttribute | string --> string
