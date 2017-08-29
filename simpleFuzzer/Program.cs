@@ -12,7 +12,7 @@ namespace simpleFuzzer
     {
         public static int varCount = 0;
         public static int fileCount = 0;
-        public static List<Element> created = new List<Element>();
+        public static List<Element> created = new List<Element>{ new Element("bool_x", "bool", new List<string>{"true", "false"}, new List<EleMethod>())};
         public static Random rand = new Random();//Random must be outside of function
         static void Main(string[] args)
         {
@@ -71,16 +71,44 @@ namespace simpleFuzzer
             int numM = rand.Next(e.methods.Count);
             for (int j = 0; j < numM; j++)
             {
+                //choose random method + call method on element
                 int randM = rand.Next(e.methods.Count);
                 string[] p = e.methods[randM].parameters.ToArray();
                 string str = "";
                 foreach (string param in p)
                 {
-                    str += param;
+                    str += param + ", ";
                 }
-                block += e.name + "." + e.methods[randM].name + "(" +  str + ");\n";
-            }
+                if(str.Trim().Length > 1)
+                {
+                    str = str.Substring(0, str.Length - 2).Trim();
+                }
+                string value = "";
+                //if the method requires parameters
+                if (str != "")
+                {
+                    //search for created element of correct type - should be fixed so that not the first in list
+                    foreach (Element el in created)
+                    {
+                        if (el.type == str)
+                        {
+                            value = el.name;
+                        }
+                    }
+                    //if there were no matches in created, make a new element
+                    if (value == "")
+                    {
+                        Element newEl = new Element(str);
+                        newEl.name = str + "_" + varCount;
+                        value = newEl.name;
+                        Console.WriteLine("newEl " + value);
+                        varCount++;
+                        created.Add(newEl);
+                    }
+                }
 
+                block += e.name + "." + e.methods[randM].name + "(" +  value + ");\n";
+            }
             return block;
         }
         public static List<Element> ReadGram(string gram)
@@ -117,12 +145,6 @@ namespace simpleFuzzer
                             m.parameters.Add(ptemp.Trim());
                         }
                         temp.methods.Add(m);
-                        /*foreach (string p in m.parameters)
-                        {
-                            Console.WriteLine("parameterfinal: " + p);
-                        }*/
-                        //add return values
-                        //List<string> re = line.Trim().Substring(line.Trim().IndexOf("-->"));
 
                     }
                     else if (line.IndexOf("A: ") != -1)

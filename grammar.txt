@@ -10,9 +10,9 @@ element::
 	M: hasChildNodes | --> bool
 	M: toString | --> string
 	M: removeAttribute | string -->
-	M: removeChild | node -->
+	M: removeChild | Node -->
 	M: setAttribute | string, string -->
-	M: setAttributeNode | node -->
+	M: setAttributeNode | Node -->
 	A: id
 	A: innerHTML
 	A: parentNode
