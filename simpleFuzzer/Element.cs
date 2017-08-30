@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace simpleFuzzer
 {
@@ -22,6 +23,21 @@ namespace simpleFuzzer
             type = t;
             attributes = new List<EleAtt>();
             methods = new List<EleMethod>();
+        }
+        public Element(string type, Element inherit)
+        {
+            name = name;
+            type = type;
+            attributes = attributes;
+            for (int i = 0; i < inherit.attributes.Count(); i++)
+            {
+                attributes.Add(inherit.attributes[i]);
+            }
+            methods = methods;
+            for (int j = 0; j < inherit.methods.Count(); j++)
+            {
+                methods.Add(inherit.methods[j]);
+            }
         }
         public Element(string nm, string t)
         {

@@ -17,62 +17,49 @@ namespace simpleFuzzer
         public static List<Element> createdEl = new List<Element>{ };
         public static List<JSElement> createdJSEl = new List<JSElement> { };
         public static Random rand = new Random();//Random must be outside of function
+        public static List<Element> gram;//grammar.txt, parsed
         static void Main(string[] args)
         {
             //read grammar
-            string gram = File.ReadAllText(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt").Trim();
+            string gramStr = File.ReadAllText(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt").Trim();
             //parse grammar
-            List<Element> gra = ReadGram(gram);
+            gram = ReadGram(gramStr);
 
             //create string of file
             string str = "";
 
             //add base elements to str
-            createdEl.Add(new Element("bool_x", "bool", new List<EleAtt>(), new List<EleMethod>()));
-            foreach (Element e in createdEl)
+            createdJSEl.Add(new JSElement("bool_x", "Boolean"));
+                //could add elements to arrays in beginning, then use foreach loop to print them out
+
+            for (int i = 0; i < rand.Next(50, 100); i++)
             {
-
-            }
-
-            for (int i = 0; i < rand.Next(30, 50); i++)
-            {
-                //random element
-                str += GenerateRandElement(gra, createdEl);
-                //random EventListener
-                str += GenerateRandEventListener(gra, createdEl);
-                //delete random event listener
-
+                if(rand.Next(10) < 5)
+                {
+                    //random element
+                    str += GenerateRandElement();
+                } else
+                {
+                    //random EventListener
+                    str += GenerateRandEventListener();
+                }
+                // else delete random event listener
             }
             Console.WriteLine(str);
+
             //create js file of str
             CreateFile(str);
 
-            //create local host, open html file?
-            /*string url = "http://localhost:8080/HTMLPage1.html";
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-            //read
-            Stream s = response.GetResponseStream();
-            StreamReader reader = new StreamReader(s);
-            string str = reader.ReadToEnd();
-            //Console.Write(str);
-            response.Close();
-
-            Console.WriteLine(str);*/
-
-
             Console.ReadLine();
-
         }
 
-        private static string GenerateRandEventListener(List<Element> gra, List<Element> createdEl)
+        private static string GenerateRandEventListener()
         {
             string[] eventVal= { "click", "mousedown", "keydown", "error", "unload", "drag", "load" };
             string block = "";
 
             //random element
-            string randomStuff = GenerateRandElement(gra, createdEl);
+            string randomStuff = GenerateRandElement();
 
             block += createdEl[rand.Next(createdEl.Count)].name + "." + "addEventListener(\"" + eventVal[rand.Next(eventVal.Length)] + "\", function() {\n" + randomStuff + "});\n";
             return block;
@@ -89,10 +76,10 @@ namespace simpleFuzzer
             fileWrite.Close();
             Console.ReadLine();
         }
-        public static string GenerateRandElement(List<Element> gram, List<Element> createdEl)
+        public static string GenerateRandElement()
         {
             //choose random element index
-            int r = rand.Next(1, gram.Count);
+            int r = rand.Next(0, gram.Count);
 
             //create element
             Element e = gram[r];
@@ -100,22 +87,18 @@ namespace simpleFuzzer
             varCount++;
 
             //choose random way to append to dom
-            string[] domAppend = { "createTextNode", "appendChild", "insertBefore" };
-
-            //choose random dom element to append to
-            //string[] dom = { "body", "html" };
+            string[] domAppend = { "createTextNode", "appendChild", "insertBefore", "replaceChild" };
 
             //initialize element in string
             String block = "var " + e.name + " = " + "document.createElement(\"" + e.type + "\");\n";
 
             //optional - make variable by calling method from another variable
-            if(rand.Next() > 0.5)//happens ~1/2 the time
+            /*if(rand.Next() > 0.5)//happens ~1/2 the time
             {
 
-            }
+            }*/
 
             //append element to dom
-            //block += "document." + dom[rand.Next(dom.Length)] + "." + domAppend[rand.Next(domAppend.Length)] + "(" + e.name + ");\n";
             string appendTo = "";
             if(e.name.IndexOf("_0") != -1) //append first element to body
             {
@@ -246,7 +229,7 @@ namespace simpleFuzzer
                     varCount++;
                     createdJSEl.Add(newEl);
                 }
-                block += "if(" + ifVal + ") {\n" + GenerateRandElement(gram, createdEl) + "}\n";
+                block += "if(" + ifVal + ") {\n" + GenerateRandElement() + "}\n";
             }
             return block;
         }
@@ -260,10 +243,28 @@ namespace simpleFuzzer
             {
                 if (temp != null && line.Trim() != null)
                 {
-                    if (line.IndexOf("::") != -1)
+                    if (line.IndexOf("::") != -1)//if heading line of grammar
                     {
+                        //search for inheritance
+                        bool inherit = false;
+                        for (int i = 0; i < createdEl.Count(); i++)
+                        {
+                            //if there is an element to inherit from
+                            if (elements[i].type.IndexOf(line.Substring(line.IndexOf("::"))) != -1)
+                            {
+                                temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")),createdEl[i]);
+                                Console.WriteLine("Element created with inheritance: " + temp.name);
+                                inherit = true;
+                                i = createdEl.Count();//end loop
+                            }
+                        }
+                        //if no inheritance
+                        if (!inherit)
+                        {
+                            temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")));
+                            //Console.WriteLine(temp.type);
+                        }
                         elements.Add(temp);
-                        temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")));
                     }
                     else if (line.IndexOf("M: ") != -1)
                     {
@@ -340,6 +341,11 @@ namespace simpleFuzzer
                     }
                 }
             }
+            foreach(EleAtt a in temp.attributes)
+            {
+                Console.WriteLine(a.name);
+            }
+            Console.WriteLine(temp.type);
             elements.Add(temp);
 
             return elements;
