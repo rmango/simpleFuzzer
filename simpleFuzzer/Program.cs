@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -20,14 +22,32 @@ namespace simpleFuzzer
             string gram = File.ReadAllText(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt").Trim();
             //parse grammar
             List<Element> gra = ReadGram(gram);
+            //create and print to js file
             CreateFile(gra);
-            
+
+            //create local host, open html file?
+            /*string url = "http://localhost:8080/HTMLPage1.html";
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            //read
+            Stream s = response.GetResponseStream();
+            StreamReader reader = new StreamReader(s);
+            string str = reader.ReadToEnd();
+            //Console.Write(str);
+            response.Close();
+
+            Console.WriteLine(str);*/
+
+
+            Console.ReadLine();
+
         }
         public static void CreateFile(List<Element> gra)
         {
             //create string of file
             StringBuilder str = new StringBuilder();
-            for (int i = 0; i < rand.Next(10, 15); i++)
+            for (int i = 0; i < rand.Next(30, 50); i++)
             {
                 str.Append(GenerateRandElement(gra, created));
             }
@@ -35,6 +55,7 @@ namespace simpleFuzzer
 
             //turn string into file
             string fuzzFile = "fuzzerFile_" + fileCount;
+            fileCount++;
             FileStream fuzzerFile = File.Create(fuzzFile);
             StreamWriter fileWrite = new StreamWriter(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\" + fuzzFile + ".js");
             fileWrite.Write(str.ToString());
@@ -54,8 +75,20 @@ namespace simpleFuzzer
             //choose random way to append to dom
             string[] domAppend = { "createTextNode", "appendChild", "insertBefore" };
 
+            //choose random dom element to append to
+            string[] dom = { "body", "html" };
+
             //initialize element in string
-            String block = "var " + e.name + " = " + "document.createElement(\"" + e.type + "\");\ndocument.body." + domAppend[rand.Next(domAppend.Length)] + "(" + e.name + ");\n";
+            String block = "var " + e.name + " = " + "document.createElement(\"" + e.type + "\");\n";
+
+            //optional - make variable by calling method from another variable
+            if(rand.Next() > 0.5)//happens ~1/2 the time
+            {
+                
+            }
+
+            //append element to dom
+            block += "document." + dom[rand.Next(dom.Length)] + "." + domAppend[rand.Next(domAppend.Length)] + "(" + e.name + ");\n";
 
             //if has children, can replace or remove children
 
@@ -69,7 +102,7 @@ namespace simpleFuzzer
                 {
                     valA = at.values[rand.Next(at.values.Length)];
                 }
-                block += e.name + ".setAttribute(" + at.name + ", \"" + valA + "\");\n";
+                block += e.name + "." + at.name + " = \"" + valA + "\";\n";
             }
             //add element to list of created elements
             created.Add(e);
@@ -150,6 +183,22 @@ namespace simpleFuzzer
                         {
                             m.parameters.Add(ptemp.Trim());
                         }
+
+                        //add return types to method object
+                        int rstart = line.IndexOf("-->") + 3;
+                        int rlen = line.Length - rstart;
+                        string rtemp = line.Substring(rstart, rlen);
+                        if (rtemp.IndexOf(",") != -1 && rtemp.Trim().Length > 2)
+                        {
+                            m.re.Add(rtemp.Substring(0, ptemp.IndexOf(",")).Trim());
+                            rtemp = rtemp.Substring(rtemp.IndexOf(",") + 1);
+                        }
+                        if (rtemp.Trim() != "")
+                        {
+                            m.re.Add(rtemp.Trim());
+                        }
+
+                        //add method object to element object
                         temp.methods.Add(m);
 
                     }
@@ -163,18 +212,22 @@ namespace simpleFuzzer
                         string typeA = line.Substring(Amid + 7, Aend - Amid - 7);
                         string vals = line.Substring(Aend + 2);
                         string[] valA = new string[] { };
-                        if (vals.IndexOf(",") != -1)
+                        while (vals.Trim().Length > 0 && vals.IndexOf(",") != -1)
                         {
-                            while (vals.Trim().Length > 0)
+                            string[] tempVal = { vals.Substring(0, vals.IndexOf(", ")) };
+                            valA = valA.Union(tempVal).ToArray();
+                            vals = vals.Substring(vals.IndexOf(", ") + 1).Trim();
+                        }
+                         if (vals.Trim() == "")//if no values, assign random values
+                        {
+                            //generate random string
+                            string randomStr = "";
+                            for(int k = 0; k < rand.Next(5, 25); k++)
                             {
-                                string[] tempVal = { vals.Substring(0, vals.IndexOf(", ")) };
-                                valA = valA.Union(tempVal).ToArray();
-                                vals = vals.Substring(vals.IndexOf(", ") + 1);
+                                int dec = rand.Next(0, 254);
+                                randomStr += Convert.ToChar(dec).ToString();
                             }
-                        } else if (vals.Trim() == "")
-                        {
-                            //if no values, assign random values
-                            valA = new string[] { "abc", "the quick brown fox", "123" };
+                            valA = new string[] { "abc", "123", "true", randomStr };
                         } else
                         {
                             valA = new string[]{ vals };

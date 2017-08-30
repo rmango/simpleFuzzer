@@ -35,6 +35,9 @@ element::
 	A: children | string -- 
 	A: className | string -- 
 	A: attributes | string -- 
+	A: style.borderWidth | string -- thick, thin, medium
+	A: style.borderStyle | string -- solid, none, hidden, dotted, dashed, double, groove, ridge, inset, outset
+	A: style.borderColor | string -- blue, green, red
 
 iframe::element
 	A: src | string -- 
