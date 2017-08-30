@@ -20,10 +20,11 @@ namespace simpleFuzzer
             string gram = File.ReadAllText(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt").Trim();
             //parse grammar
             List<Element> gra = ReadGram(gram);
-            /*foreach (Element e in gra)
-            {
-                Console.WriteLine(e.type);
-            }*/
+            CreateFile(gra);
+            
+        }
+        public static void CreateFile(List<Element> gra)
+        {
             //create string of file
             StringBuilder str = new StringBuilder();
             for (int i = 0; i < rand.Next(10, 15); i++)
@@ -62,14 +63,13 @@ namespace simpleFuzzer
             int numA = rand.Next(e.attributes.Count);
             for (int j = 0; j < numA; j++)
             {
-                Console.WriteLine(e.attributes[0].name);//rand.Next(e.attributes.Count));
                 EleAtt at = e.attributes[rand.Next(e.attributes.Count)];
                 string valA = "";
                 if(at.values != null)
                 {
-                    valA = at.values[0];//[rand.Next(at.values.Length)];
+                    valA = at.values[rand.Next(at.values.Length)];
                 }
-                block += e.name + ".setAttribute(" + at.name + ", " + valA + ");\n";
+                block += e.name + ".setAttribute(" + at.name + ", \"" + valA + "\");\n";
             }
             //add element to list of created elements
             created.Add(e);
@@ -108,7 +108,7 @@ namespace simpleFuzzer
                         Element newEl = new Element(str);
                         newEl.name = str + "_" + varCount;
                         value = newEl.name;
-                        Console.WriteLine("newEl " + value);
+                        //Console.WriteLine("newEl " + value);
                         varCount++;
                         created.Add(newEl);
                     }
@@ -157,11 +157,31 @@ namespace simpleFuzzer
                     {
                         //create attribute object
                         int Astart = line.IndexOf("A: ") + 3;
-                        int Aend = line.IndexOf("|") - 5;
-                        string nameA = line.Substring(Astart, Aend);
-                        string typeA = line.Substring(Aend + 7);
-                        Console.WriteLine("name: " + nameA + "type: " + typeA);
-                        EleAtt a = new EleAtt(nameA, typeA);
+                        int Amid = line.IndexOf("|") - 5;
+                        int Aend = line.IndexOf("--");
+                        string nameA = line.Substring(Astart, Amid);
+                        string typeA = line.Substring(Amid + 7, Aend - Amid - 7);
+                        string vals = line.Substring(Aend + 2);
+                        string[] valA = new string[] { };
+                        if (vals.IndexOf(",") != -1)
+                        {
+                            while (vals.Trim().Length > 0)
+                            {
+                                string[] tempVal = { vals.Substring(0, vals.IndexOf(", ")) };
+                                valA = valA.Union(tempVal).ToArray();
+                                vals = vals.Substring(vals.IndexOf(", ") + 1);
+                            }
+                        } else if (vals.Trim() == "")
+                        {
+                            //if no values, assign random values
+                            valA = new string[] { "abc", "the quick brown fox", "123" };
+                        } else
+                        {
+                            valA = new string[]{ vals };
+                        }
+                        //Console.WriteLine("vals: " + valA[0]);
+                        //Console.WriteLine("name: " + nameA + "type: " + typeA);
+                        EleAtt a = new EleAtt(nameA, typeA, valA);
                         temp.attributes.Add(a);
                     }
                 }
