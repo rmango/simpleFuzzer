@@ -1,70 +1,71 @@
 element::
 	M: appendChild |  -->
-	M: cloneNode | bool --> Node
-	M: contains | Node --> bool
-	M: getAttribute | string --> string
-	M: getElementsByClassName | string --> element[]
-	M: getElementsByTagName | string --> element[]
-	M: hasAttribute | string --> bool
-	M: hasAttributes | --> bool
-	M: hasChildNodes | --> bool
-	M: toString | --> string
-	M: removeAttribute | string -->
+	M: cloneNode | Boolean --> Node
+	M: contains | Node --> Boolean
+	M: getAttribute | String --> String
+	M: getElementsByClassName | String --> element[]
+	M: getElementsByTagName | String --> element[]
+	M: hasAttribute | String --> Boolean
+	M: hasAttributes | --> Boolean
+	M: hasChildNodes | --> Boolean
+	M: toString | --> String
+	M: removeAttribute | String -->
 	M: removeChild | Node -->
-	M: setAttribute | string, string -->
+	M: replaceChild | String, Node -->
+	M: setAttribute | String, String -->
 	M: setAttributeNode | Node -->
-	A: id | string -- 
-	A: innerHTML | string -- 
-	A: parentNode | string -- 
-	A: parentElement | string -- 
-	A: contentEditable | string -- 
-	A: dir | string -- 
-	A: firstChild | string -- 
-	A: firstElementChild | string -- 
-	A: style | string -- 
-	A: tabIndex | string -- 
-	A: tagName | string -- 
-	A: textContent | string -- 
-	A: title | string -- 
-	A: clientHeight | string -- 
-	A: clientLeft | string -- 
-	A: clientTop | string -- 
-	A: clientWidth | string -- 
-	A: childElementCount | string -- 
-	A: childNodes | string -- 
-	A: children | string -- 
-	A: className | string -- 
-	A: attributes | string -- 
-	A: style.borderWidth | string -- thick, thin, medium
-	A: style.borderStyle | string -- solid, none, hidden, dotted, dashed, double, groove, ridge, inset, outset
-	A: style.borderColor | string -- blue, green, red
+	A: id | String -- 
+	A: innerHTML | String -- 
+	A: parentNode | String -- 
+	A: parentElement | String -- 
+	A: contentEditable | String -- 
+	A: dir | String -- 
+	A: firstChild | String -- 
+	A: firstElementChild | String -- 
+	A: style | String -- 
+	A: tabIndex | String -- 
+	A: tagName | String -- 
+	A: textContent | String -- 
+	A: title | String -- 
+	A: clientHeight | String -- 
+	A: clientLeft | String -- 
+	A: clientTop | String -- 
+	A: clientWidth | String -- 
+	A: childElementCount | String -- 
+	A: childNodes | String -- 
+	A: children | String -- 
+	A: className | String -- 
+	A: attributes | String -- 
+	A: style.borderWidth | String -- thick, thin, medium
+	A: style.borderStyle | String -- solid, none, hidden, dotted, dashed, double, groove, ridge, inset, outset
+	A: style.borderColor | String -- blue, green, red
 
 iframe::element
-	A: src | string -- 
-	A: width | string -- 
-	A: name | string -- 
+	A: src | String -- 
+	A: width | String -- 
+	A: name | String -- 
 
 button::element
-	A: name | string -- 
-	A: value | string -- 
-	A: type | string -- 
+	A: name | String -- 
+	A: value | String -- 
+	A: type | String -- 
 
 textarea::element
 	M: select | -->
-	A: type | string -- 
-	A: value | string -- 
+	A: type | String -- 
+	A: value | String -- 
 
 canvas::element
 	M: createLinearGradient | -->
 	M: createPattern | -->
 	M: createRadialGradient | -->
 	M: addColorStop | -->
-	A: fillStyle | string -- 
-	A: strokeStyle | string -- 
-	A: shadowColor | string -- 
-	A: shadowBlur | string -- 
-	A: shadowOffsetX | string -- 
-	A: shadowOffsetY | string -- 
+	A: fillStyle | String -- 
+	A: strokeStyle | String -- 
+	A: shadowColor | String -- 
+	A: shadowBlur | String -- 
+	A: shadowOffsetX | String -- 
+	A: shadowOffsetY | String -- 
 
 audio::element
 	M: addTextTrack | -->
@@ -74,13 +75,13 @@ audio::element
 	M: load | -->
 	M: play | -->
 	M: pause | -->
-	A: seeking | string -- 
-	A: src | string -- 
-	A: textTracks | string -- 
-	A: volume | string -- 
+	A: seeking | String -- 
+	A: src | String -- 
+	A: textTracks | String -- 
+	A: volume | String -- 
 
 table::element
 	M: insertRow | -->
-	A: thead | string --
+	A: thead | String --
 
 
