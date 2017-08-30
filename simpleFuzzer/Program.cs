@@ -14,7 +14,7 @@ namespace simpleFuzzer
     {
         public static int varCount = 0;
         public static int fileCount = 0;
-        public static List<Element> created = new List<Element>{ new Element("bool_x", "bool", new List<EleAtt>(), new List<EleMethod>())};
+        public static List<Element> created = new List<Element>{ };
         public static Random rand = new Random();//Random must be outside of function
         static void Main(string[] args)
         {
@@ -47,6 +47,14 @@ namespace simpleFuzzer
         {
             //create string of file
             StringBuilder str = new StringBuilder();
+
+            //add base elements to str
+            created.Add(new Element("bool_x", "bool", new List<EleAtt>(), new List<EleMethod>()));
+            foreach (Element e in created)
+            {
+                
+            }
+
             for (int i = 0; i < rand.Next(30, 50); i++)
             {
                 str.Append(GenerateRandElement(gra, created));
@@ -76,7 +84,7 @@ namespace simpleFuzzer
             string[] domAppend = { "createTextNode", "appendChild", "insertBefore" };
 
             //choose random dom element to append to
-            string[] dom = { "body", "html" };
+            //string[] dom = { "body", "html" };
 
             //initialize element in string
             String block = "var " + e.name + " = " + "document.createElement(\"" + e.type + "\");\n";
@@ -84,11 +92,22 @@ namespace simpleFuzzer
             //optional - make variable by calling method from another variable
             if(rand.Next() > 0.5)//happens ~1/2 the time
             {
-                
+
             }
 
             //append element to dom
-            block += "document." + dom[rand.Next(dom.Length)] + "." + domAppend[rand.Next(domAppend.Length)] + "(" + e.name + ");\n";
+            //block += "document." + dom[rand.Next(dom.Length)] + "." + domAppend[rand.Next(domAppend.Length)] + "(" + e.name + ");\n";
+            string appendTo = "";
+            if(e.name.IndexOf("_0") != -1) //append first element to body
+            {
+                appendTo = "body";
+            }
+            else
+            {
+                appendTo = created[rand.Next(created.Count)].name;
+
+            }
+            block += "document." + appendTo + "." + domAppend[rand.Next(domAppend.Length)] + "(" + e.name + ");\n";
 
             //if has children, can replace or remove children
 
@@ -135,6 +154,7 @@ namespace simpleFuzzer
                             value = el.name;
                         }
                     }
+
                     //if there were no matches in created, make a new element
                     if (value == "")
                     {
@@ -147,6 +167,30 @@ namespace simpleFuzzer
                     }
                 }
                 block += e.name + "." + e.methods[randM].name + "(" +  value + ");\n";
+            }
+
+            //if statements
+            if(rand.Next(0, 10) < 4)
+            {
+                //search for bool elements
+                string ifVal = "";
+                foreach (Element ele in created) // - must change so that doesn't just choose the first element
+                {
+                    if (ele.type == "bool")
+                    {
+                        ifVal = ele.name;
+                    }
+                }
+                //if there were no matches in created, make a new element
+                if (ifVal == "")
+                {
+                    Element newEl = new Element("bool_" + varCount, "bool");
+                    ifVal = newEl.name;
+                    //Console.WriteLine("newEl " + ifVal);
+                    varCount++;
+                    created.Add(newEl);
+                }
+                block += "if(" + ifVal + ") {\n" + GenerateRandElement(gram, created) + "}\n";
             }
             return block;
         }

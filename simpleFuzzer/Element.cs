@@ -23,6 +23,13 @@ namespace simpleFuzzer
             attributes = new List<EleAtt>();
             methods = new List<EleMethod>();
         }
+        public Element(string nm, string t)
+        {
+            name = nm;
+            type = t;
+            attributes = new List<EleAtt>();
+            methods = new List<EleMethod>();
+        }
 
         public Element(string n, string t, List<EleAtt> att, List<EleMethod> me)
         {
