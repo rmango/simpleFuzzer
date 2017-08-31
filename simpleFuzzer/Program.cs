@@ -21,7 +21,7 @@ namespace simpleFuzzer
         static void Main(string[] args)
         {
             //read grammar
-            string gramStr = File.ReadAllText(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt").Trim();
+            string gramStr = File.ReadAllText(@"C:\Users\Morgan\Documents\GitHub\simpleFuzzer\grammar.txt").Trim();
             //parse grammar
             gram = ReadGram(gramStr);
 
@@ -34,10 +34,16 @@ namespace simpleFuzzer
 
             for (int i = 0; i < rand.Next(50, 100); i++)
             {
-                if(rand.Next(10) < 5)
+                //do something random
+                int j = rand.Next(10);
+                if(j < 3)
                 {
                     //random element
                     str += GenerateRandElement();
+                } else if(j < 6)
+                {
+                    //if statement
+                    str += IfStatement();
                 } else
                 {
                     //random EventListener
@@ -71,7 +77,7 @@ namespace simpleFuzzer
             string fuzzFile = "fuzzerFile_" + fileCount;
             fileCount++;
             FileStream fuzzerFile = File.Create(fuzzFile);
-            StreamWriter fileWrite = new StreamWriter(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\" + fuzzFile + ".js");
+            StreamWriter fileWrite = new StreamWriter(@"C:\Users\Morgan\Documents\GitHub\simpleFuzzer\" + fuzzFile + ".js");
             fileWrite.Write(str.ToString());
             fileWrite.Close();
             Console.ReadLine();
@@ -137,20 +143,8 @@ namespace simpleFuzzer
                 int randM = rand.Next(e.methods.Count);
                 string[] p = e.methods[randM].parameters.ToArray();
 
-                /*/string str = "";
-                foreach (string param in p)
-                {
-                    str += param + ", ";
-                }
-                //Console.WriteLine("STR: " + str);
-                if(str.Trim().Length > 1)
-                {
-                    str = str.Substring(0, str.Length - 2).Trim();
-                }*/
-
                 //for each parameter, find another element with attributes or methods of the correct type
-                //start of method string
-                block += e.name + "." + e.methods[randM].name + "(";
+                block += e.name + "." + e.methods[randM].name + "("; //start of method string
                 string block2 = "";
                 foreach (string param in p)
                 {
@@ -183,6 +177,22 @@ namespace simpleFuzzer
                                 }
                             }
                         }
+                        //see if any matches in createdJSEL
+                        if(values.Length == 0)
+                        {
+                            foreach(JSElement jel in createdJSEl)
+                            {
+                                if(jel.type == param)
+                                {
+                                    if(jel.name == null)
+                                    {
+                                        jel.name = jel.type + "_" + varCount;
+                                        varCount++;
+                                    }
+                                    value = jel.name;
+                                }
+                            }
+                        }
                         //if there were no matches in createdEl, make a new js object with attributes or methods of correct type
                         if (values.Length == 0)
                         {
@@ -199,44 +209,50 @@ namespace simpleFuzzer
                         }
                     }
                     //start of method string
-                    block += value;
+                    block += value + ", ";
                 }
                 //end of method string
-                block.TrimEnd(',').Trim();
+                block = block.Substring(0, block.Length - 2); //to remove ", "
                 block += ");\n";
                 block = block2 + block;
-            }
-
-            //if statements
-            if(rand.Next(0, 10) < 4)
-            {
-                //search for bool elements
-                string ifVal = "";
-                foreach (JSElement ele in createdJSEl) // - must change so that doesn't just choose the first element
-                {
-                    if (ele.type == "Boolean")
-                    {
-                        ifVal = ele.name;
-                    }
-                }
-                //if there were no matches in created, make a new element
-                if (ifVal == "")
-                {
-                    JSElement newEl = new JSElement("bool_" + varCount, "Boolean");
-                    block += "var " + newEl.name + " = new " + newEl.type + "();\n";
-                    ifVal = newEl.name;
-                    //Console.WriteLine("newEl " + ifVal);
-                    varCount++;
-                    createdJSEl.Add(newEl);
-                }
-                block += "if(" + ifVal + ") {\n" + GenerateRandElement() + "}\n";
             }
             return block;
         }
 
+        public static string IfStatement()
+        {
+            string block = "";
+            //search for bool elements
+            List<string> matches = new List<string>{ };
+            foreach (JSElement ele in createdJSEl)
+            {
+                if (ele.type == "Boolean")
+                {
+                    matches.Add(ele.name);
+                    //ifVal = ele.name;
+                }
+            }
+            string ifVal = "";
+            if(matches.Count != 0)
+            {
+                ifVal = matches[rand.Next(matches.Count)];
+            }
+            //if there were no matches in created, make a new element
+            if (ifVal == "")
+            {
+                JSElement newEl = new JSElement("bool_" + varCount, "Boolean");
+                block += "var " + newEl.name + " = new " + newEl.type + "();\n";
+                ifVal = newEl.name;
+                //Console.WriteLine("newEl " + ifVal);
+                varCount++;
+                createdJSEl.Add(newEl);
+            }
+            block += "if(" + ifVal + ") {\n" + GenerateRandElement() + "}\n";
+            return block;
+        }
         public static List<Element> ReadGram(string gram)
         {
-            string[] lines = File.ReadAllLines(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt");
+            string[] lines = File.ReadAllLines(@"C:\Users\Morgan\Documents\GitHub\simpleFuzzer\grammar.txt");
             List<Element> elements = new List<Element>();
             Element temp = new Element();
             foreach (string line in lines)
