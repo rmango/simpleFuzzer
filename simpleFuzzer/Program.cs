@@ -17,20 +17,20 @@ namespace simpleFuzzer
         public static List<Element> createdEl = new List<Element>{ };
         public static List<JSElement> createdJSEl = new List<JSElement> { };
         public static Random rand = new Random();//Random must be outside of function
-        public static List<Element> gram;//grammar.txt, parsed
+        public static List<Element> gram = new List<Element> { };//grammar.txt, parsed
         static void Main(string[] args)
         {
-            //read grammar
-            string gramStr = File.ReadAllText(@"C:\Users\Morgan\Documents\GitHub\simpleFuzzer\grammar.txt").Trim();
-            //parse grammar
-            gram = ReadGram(gramStr);
+            //read + parse grammar
+            gram = ReadGram();
 
             //create string of file
             string str = "";
 
             //add base elements to str
             createdJSEl.Add(new JSElement("bool_x", "Boolean"));
-                //could add elements to arrays in beginning, then use foreach loop to print them out
+            //could add elements to arrays in beginning, then use foreach loop to print them out
+
+            str += GenerateRandElement();
 
             for (int i = 0; i < rand.Next(30, 50); i++)
             {
@@ -64,7 +64,7 @@ namespace simpleFuzzer
             string fuzzFile = "fuzzerFile_" + fileCount;
             fileCount++;
             FileStream fuzzerFile = File.Create(fuzzFile);
-            StreamWriter fileWrite = new StreamWriter(@"C:\Users\Morgan\Documents\GitHub\simpleFuzzer\" + fuzzFile + ".js");
+            StreamWriter fileWrite = new StreamWriter(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\" + fuzzFile + ".js");
             fileWrite.Write(str.ToString());
             fileWrite.Close();
             Console.ReadLine();
@@ -185,7 +185,6 @@ namespace simpleFuzzer
                         {
                             JSElement newEl = new JSElement(param + "_" + varCount, param);
                             block2 += "var " + newEl.name + " = new " + newEl.type + "();\n";
-                            varCount++;
                             value = newEl.name;
                             varCount++;
                             createdJSEl.Add(newEl);
@@ -237,28 +236,39 @@ namespace simpleFuzzer
             block += "if(" + ifVal + ") {\n" + GenerateRandElement() + "}\n";
             return block;
         }
-        public static List<Element> ReadGram(string gram)
+        public static List<Element> ReadGram()
         {
-            string[] lines = File.ReadAllLines(@"C:\Users\Morgan\Documents\GitHub\simpleFuzzer\grammar.txt");
-            List<Element> elements = new List<Element>();
+            string[] lines = File.ReadAllLines(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt");
+            //List<Element> elements = new List<Element>();//list of elements in grammar
             Element temp = new Element();
             foreach (string line in lines)
             {
                 if (temp != null && line.Trim() != null)
                 {
+                    bool inherit = false;
+
                     if (line.IndexOf("::") != -1)//if heading line of grammar
                     {
-                        //search for inheritance
-                        bool inherit = false;
-                        for (int i = 0; i < createdEl.Count(); i++)
+                        //start of new element: add previous element to gram
+                        if (gram.Count() > 0)
                         {
-                            //if there is an element to inherit from
-                            if (elements[i].type.IndexOf(line.Substring(line.IndexOf("::"))) != -1)
+                            gram.Add(temp);
+                            Console.WriteLine("NAME: " + temp.type);
+
+                            //search for inheritance
+                            for (int i = 0; i < gram.Count(); i++)
                             {
-                                temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")),createdEl[i]);
-                                Console.WriteLine("Element created with inheritance: " + temp.name);
-                                inherit = true;
-                                i = createdEl.Count();//end loop
+                                Console.WriteLine("Count: " + gram.Count() + "type: " + gram[i].type + " index of " + line.Substring(line.IndexOf("::") + 2).Trim());
+                                Console.WriteLine(line.Substring(line.IndexOf("::") + 2));
+                                //if there is an element to inherit from within the grammar
+                                if (gram[i].type.IndexOf(line.Substring(line.IndexOf("::") + 2).Trim()) != -1)
+                                {
+                                    temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")), gram[i]);
+                                    temp.name = temp.type + "gram";
+                                    Console.WriteLine("Element created with inheritance: " + temp.type);
+                                    inherit = true;
+                                    i = gram.Count();//end loop
+                                }
                             }
                         }
                         //if no inheritance
@@ -267,9 +277,8 @@ namespace simpleFuzzer
                             temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")));
                             //Console.WriteLine(temp.type);
                         }
-                        elements.Add(temp);
-                    }
-                    else if (line.IndexOf("M: ") != -1)
+                        gram.Add(temp);
+                    } else if (line.IndexOf("M: ") != -1)
                     {
                         //create method object w/name
                         int start = line.IndexOf("M: ") + 2;
@@ -303,8 +312,7 @@ namespace simpleFuzzer
                         //add method object to element object
                         temp.methods.Add(m);
 
-                    }
-                    else if (line.IndexOf("A: ") != -1)
+                    } else if (line.IndexOf("A: ") != -1)
                     {
                         //create attribute object
                         int Astart = line.IndexOf("A: ") + 3;
@@ -341,14 +349,7 @@ namespace simpleFuzzer
                     }
                 }
             }
-            foreach(EleAtt a in temp.attributes)
-            {
-                Console.WriteLine(a.name);
-            }
-            Console.WriteLine(temp.type);
-            elements.Add(temp);
-
-            return elements;
+            return gram;
         }
     }
 }

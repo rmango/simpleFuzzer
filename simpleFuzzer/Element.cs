@@ -24,16 +24,16 @@ namespace simpleFuzzer
             attributes = new List<EleAtt>();
             methods = new List<EleMethod>();
         }
-        public Element(string type, Element inherit)
+        public Element(string t, Element inherit)
         {
             name = name;
-            type = type;
-            attributes = attributes;
+            type = t;
+            attributes = new List<EleAtt>();
             for (int i = 0; i < inherit.attributes.Count(); i++)
             {
                 attributes.Add(inherit.attributes[i]);
             }
-            methods = methods;
+            methods = new List<EleMethod>();
             for (int j = 0; j < inherit.methods.Count(); j++)
             {
                 methods.Add(inherit.methods[j]);
