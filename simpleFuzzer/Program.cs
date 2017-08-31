@@ -32,7 +32,7 @@ namespace simpleFuzzer
             createdJSEl.Add(new JSElement("bool_x", "Boolean"));
                 //could add elements to arrays in beginning, then use foreach loop to print them out
 
-            for (int i = 0; i < rand.Next(50, 100); i++)
+            for (int i = 0; i < rand.Next(30, 50); i++)
             {
                 //do something random
                 int j = rand.Next(10);
@@ -286,24 +286,26 @@ namespace simpleFuzzer
                     {
                         //create method object w/name
                         int start = line.IndexOf("M: ") + 2;
-                        EleMethod m = new EleMethod(line.Trim().Substring(start, line.Trim().IndexOf("|") - start - 1));
+                        EleMethod m = new EleMethod(line.Trim().Substring(start, line.Trim().IndexOf("|") - start));
 
                         //add parameters to method object
                         int pstart = line.IndexOf("|") + 2;
                         int plen = line.IndexOf("-->") - pstart;
                         string ptemp = line.Substring(pstart, plen);
+                        Console.WriteLine("PTEMP: " + ptemp);
                         if (ptemp.IndexOf(",") != -1 && ptemp.Trim().Length > 2)
                         {
                             m.parameters.Add(ptemp.Substring(0, ptemp.IndexOf(",")).Trim());
-                            ptemp = ptemp.Substring(ptemp.IndexOf(",") + 1);
+                            ptemp = ptemp.Substring(ptemp.IndexOf(",")).Trim().TrimStart(',');
                         }
-                        if(ptemp.Trim() != "")
-                        {
+                       // if(ptemp.Trim() != "")//if there are parameters
+                       // {
                             m.parameters.Add(ptemp.Trim());
-                        }
+                       // }
+                        Console.WriteLine("     PTEMP: " + ptemp);
 
                         //add return types to method object
-                        int rstart = line.IndexOf("-->") + 3;
+                        int rstart = line.IndexOf("-->");
                         int rlen = line.Length - rstart;
                         string rtemp = line.Substring(rstart, rlen);
                         if (rtemp.IndexOf(",") != -1 && rtemp.Trim().Length > 2)
