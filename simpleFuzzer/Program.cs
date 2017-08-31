@@ -34,22 +34,9 @@ namespace simpleFuzzer
 
             for (int i = 0; i < rand.Next(30, 50); i++)
             {
-                //do something random
-                int j = rand.Next(10);
-                if(j < 3)
-                {
-                    //random element
-                    str += GenerateRandElement();
-                } else if(j < 6)
-                {
-                    //if statement
-                    str += IfStatement();
-                } else
-                {
-                    //random EventListener
-                    str += GenerateRandEventListener();
-                }
-                // else delete random event listener
+                //list of actions
+                string[] actions = { GenerateRandElement(), IfStatement(), GenerateRandEventListener() };
+                str += actions[rand.Next(actions.Length)];
             }
             Console.WriteLine(str);
 
@@ -144,7 +131,7 @@ namespace simpleFuzzer
                 string[] p = e.methods[randM].parameters.ToArray();
 
                 //for each parameter, find another element with attributes or methods of the correct type
-                block += e.name + "." + e.methods[randM].name + "("; //start of method string
+                block += e.name + "." + e.methods[randM].name.Trim() + "("; //start of method string
                 string block2 = "";
                 foreach (string param in p)
                 {
@@ -292,17 +279,12 @@ namespace simpleFuzzer
                         int pstart = line.IndexOf("|") + 2;
                         int plen = line.IndexOf("-->") - pstart;
                         string ptemp = line.Substring(pstart, plen);
-                        Console.WriteLine("PTEMP: " + ptemp);
                         if (ptemp.IndexOf(",") != -1 && ptemp.Trim().Length > 2)
                         {
                             m.parameters.Add(ptemp.Substring(0, ptemp.IndexOf(",")).Trim());
                             ptemp = ptemp.Substring(ptemp.IndexOf(",")).Trim().TrimStart(',');
                         }
-                       // if(ptemp.Trim() != "")//if there are parameters
-                       // {
-                            m.parameters.Add(ptemp.Trim());
-                       // }
-                        Console.WriteLine("     PTEMP: " + ptemp);
+                        m.parameters.Add(ptemp.Trim());
 
                         //add return types to method object
                         int rstart = line.IndexOf("-->");
