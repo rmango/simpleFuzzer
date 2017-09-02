@@ -14,6 +14,8 @@ namespace simpleFuzzer
     {
         public static int varCount = 0;
         public static int fileCount = 0;
+        public static int nestCount = 0;
+        public static int allowedNests = 5; 
         public static List<Element> createdEl = new List<Element>{ };
         public static List<JSElement> createdJSEl = new List<JSElement> { };
         public static Random rand = new Random();//Random must be outside of function
@@ -34,6 +36,7 @@ namespace simpleFuzzer
 
             for (int i = 0; i < rand.Next(30, 50); i++)
             {
+                nestCount = 0;
                 //list of actions
                 string[] actions = { GenerateRandElement(), IfStatement(), GenerateRandEventListener() };
                 str += actions[rand.Next(actions.Length)];
@@ -51,10 +54,22 @@ namespace simpleFuzzer
             string[] eventVal= { "click", "mousedown", "keydown", "error", "unload", "drag", "load" };
             string block = "";
 
+            string action = "";
             //random element
-            string randomStuff = GenerateRandElement();
+            if (nestCount > allowedNests)
+            {
+                action = "";
+            }
+            else
+            {
+                string[] actions = { GenerateRandElement(), IfStatement(), GenerateRandEventListener() };
+                action += actions[rand.Next(actions.Length)];
+                //action = GenerateRandElement();
+            }
+            action = GenerateRandElement();
+            nestCount++;
 
-            block += createdEl[rand.Next(createdEl.Count)].name + "." + "addEventListener(\"" + eventVal[rand.Next(eventVal.Length)] + "\", function() {\n" + randomStuff + "});\n";
+            block += createdEl[rand.Next(createdEl.Count)].name + "." + "addEventListener(\"" + eventVal[rand.Next(eventVal.Length)] + "\", function() {\n" + action + "});\n";
             return block;
         }
 
@@ -85,7 +100,7 @@ namespace simpleFuzzer
             //initialize element in string
             String block = "var " + e.name + " = " + "document.createElement(\"" + e.type + "\");\n";
 
-            //optional - make variable by calling method from another variable
+            //optional - make element by calling method from another element
             /*if(rand.Next() > 0.5)//happens ~1/2 the time
             {
 
@@ -194,7 +209,7 @@ namespace simpleFuzzer
                             value = values[rand.Next(values.Length)];
                         }
                     }
-                    //start of method string
+                    //commas between parameters in method string
                     block += value + ", ";
                 }
                 //end of method string
@@ -229,11 +244,20 @@ namespace simpleFuzzer
                 JSElement newEl = new JSElement("bool_" + varCount, "Boolean");
                 block += "var " + newEl.name + " = new " + newEl.type + "();\n";
                 ifVal = newEl.name;
-                //Console.WriteLine("newEl " + ifVal);
                 varCount++;
                 createdJSEl.Add(newEl);
             }
-            block += "if(" + ifVal + ") {\n" + GenerateRandElement() + "}\n";
+
+            string action;
+            if(nestCount > allowedNests)
+            {
+                action = "";
+            } else
+            {
+                action = GenerateRandElement();
+            }
+
+            block += "if(" + ifVal + ") {\n" + action + "}\n";
             return block;
         }
         public static List<Element> ReadGram()
@@ -253,19 +277,15 @@ namespace simpleFuzzer
                         if (gram.Count() > 0)
                         {
                             gram.Add(temp);
-                            Console.WriteLine("NAME: " + temp.type);
 
                             //search for inheritance
                             for (int i = 0; i < gram.Count(); i++)
                             {
-                                Console.WriteLine("Count: " + gram.Count() + "type: " + gram[i].type + " index of " + line.Substring(line.IndexOf("::") + 2).Trim());
-                                Console.WriteLine(line.Substring(line.IndexOf("::") + 2));
                                 //if there is an element to inherit from within the grammar
                                 if (gram[i].type.IndexOf(line.Substring(line.IndexOf("::") + 2).Trim()) != -1)
                                 {
                                     temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")), gram[i]);
-                                    temp.name = temp.type + "gram";
-                                    Console.WriteLine("Element created with inheritance: " + temp.type);
+                                    temp.name = temp.type + "_gram";
                                     inherit = true;
                                     i = gram.Count();//end loop
                                 }
@@ -275,7 +295,6 @@ namespace simpleFuzzer
                         if (!inherit)
                         {
                             temp = new Element(line.Trim().Substring(0, line.Trim().IndexOf("::")));
-                            //Console.WriteLine(temp.type);
                         }
                         gram.Add(temp);
                     } else if (line.IndexOf("M: ") != -1)
@@ -342,8 +361,6 @@ namespace simpleFuzzer
                         {
                             valA = new string[]{ vals };
                         }
-                        //Console.WriteLine("vals: " + valA[0]);
-                        //Console.WriteLine("name: " + nameA + "type: " + typeA);
                         EleAtt a = new EleAtt(nameA, typeA, valA);
                         temp.attributes.Add(a);
                     }
