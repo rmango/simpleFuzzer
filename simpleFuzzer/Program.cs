@@ -14,8 +14,8 @@ namespace simpleFuzzer
     {
         public static int varCount = 0;
         public static int fileCount = 0;
-        public static int nestCount = 0;
-        public static int allowedNests = 5; 
+        //public static int nestCount = 0;
+        //public static int allowedNests = 5; 
         public static List<Element> createdEl = new List<Element>{ };
         public static List<JSElement> createdJSEl = new List<JSElement> { };
         public static Random rand = new Random();//Random must be outside of function
@@ -25,26 +25,30 @@ namespace simpleFuzzer
             //read + parse grammar
             gram = ReadGram();
 
-            //create string of file
-            string str = "";
-
-            //add base elements to str
-            createdJSEl.Add(new JSElement("bool_x", "Boolean"));
-            //could add elements to arrays in beginning, then use foreach loop to print them out
-
-            str += GenerateRandElement();
-
-            for (int i = 0; i < rand.Next(30, 50); i++)
+            for (int fileNum = 0; fileNum < 4; fileNum++)
             {
-                nestCount = 0;
-                //list of actions
-                string[] actions = { GenerateRandElement(), IfStatement(), GenerateRandEventListener() };
-                str += actions[rand.Next(actions.Length)];
-            }
-            Console.WriteLine(str);
+                //create string of file
+                string str = "";
 
-            //create js file of str
-            CreateFile(str);
+                //add base elements to str
+                createdJSEl.Add(new JSElement("bool_x", "Boolean"));
+                //could add elements to arrays in beginning, then use foreach loop to print them out
+
+                str += GenerateRandElement();
+
+                for (int i = 0; i < rand.Next(30, 50); i++)
+                {
+                    //nestCount = 0;
+                    //list of actions
+                    string[] actions = { GenerateRandElement(), IfStatement(), GenerateRandEventListener() };
+                    str += actions[rand.Next(actions.Length)];
+                }
+                Console.WriteLine(str);
+
+                //create an html file of str
+                CreateFile(str);
+                fileCount++;
+            }
 
             Console.ReadLine();
         }
@@ -56,7 +60,7 @@ namespace simpleFuzzer
 
             string action = "";
             //random element
-            if (nestCount > allowedNests)
+            /*if (nestCount > allowedNests)
             {
                 action = "";
             }
@@ -65,9 +69,9 @@ namespace simpleFuzzer
                 string[] actions = { GenerateRandElement(), IfStatement(), GenerateRandEventListener() };
                 action += actions[rand.Next(actions.Length)];
                 //action = GenerateRandElement();
-            }
+            }*/
             action = GenerateRandElement();
-            nestCount++;
+            //nestCount++;
 
             block += createdEl[rand.Next(createdEl.Count)].name + "." + "addEventListener(\"" + eventVal[rand.Next(eventVal.Length)] + "\", function() {\n" + action + "});\n";
             return block;
@@ -76,11 +80,14 @@ namespace simpleFuzzer
         public static void CreateFile(string str)
         {
             //turn string into file
-            string fuzzFile = "fuzzerFile_" + fileCount;
+            //string fuzzFile = "fuzzerFile_" + fileCount;
+            string fuzzFile = "fuzzTest_" + fileCount;
             fileCount++;
             FileStream fuzzerFile = File.Create(fuzzFile);
-            StreamWriter fileWrite = new StreamWriter(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\" + fuzzFile + ".js");
-            fileWrite.Write(str.ToString());
+            StreamWriter fileWrite = new StreamWriter(@"C:\Users\Morga\Documents\Github\simpleFuzzer\" + fuzzFile + ".html");
+            fileWrite.Write("<head><title>Test</title></head>" +
+                "<body><script>" + str.ToString() + "</script>" +
+                "<h1>Hello</h1></body>");
             fileWrite.Close();
             Console.ReadLine();
         }
@@ -248,21 +255,21 @@ namespace simpleFuzzer
                 createdJSEl.Add(newEl);
             }
 
-            string action;
-            if(nestCount > allowedNests)
+            string action = "";
+           /* if(nestCount > allowedNests)
             {
                 action = "";
             } else
             {
                 action = GenerateRandElement();
-            }
+            }*/
 
             block += "if(" + ifVal + ") {\n" + action + "}\n";
             return block;
         }
         public static List<Element> ReadGram()
         {
-            string[] lines = File.ReadAllLines(@"C:\Users\t-mograh\Documents\Visual Studio 2017\Projects\simpleFuzzer\grammar.txt");
+            string[] lines = File.ReadAllLines(@"C:\Users\Morga\Documents\Github\simpleFuzzer\grammar.txt");
             //List<Element> elements = new List<Element>();//list of elements in grammar
             Element temp = new Element();
             foreach (string line in lines)
